@@ -11,7 +11,7 @@ import FaceMeshLoader from "./models/FaceMeshLoader";
 import HandPoseLoader from "./models/HandPoseLoader";
 import MoveNetLoader from "./models/MoveNetLoader";
 import {getHeadRotation, quaternionFrom} from "./utils/keypoints";
-import {drawHand, drawPose} from "./utils/handpose";
+import {drawHand, drawPose, drawSkeleton, drawKeypoints, drawPath, drawPoint, drawKeypoint} from "./utils/handpose";
 
 export {
     HelloWorld,
@@ -23,6 +23,11 @@ export {
     HandPose,
     drawHand,
     drawPose,
+    drawSkeleton,
+    drawKeypoints,
+    drawPath,
+    drawPoint,
+    drawKeypoint,
     getHeadRotation,
     quaternionFrom,
     MoveNetLoader,
