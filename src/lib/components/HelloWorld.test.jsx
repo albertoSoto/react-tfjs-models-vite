@@ -1,7 +1,7 @@
 import React from 'react'
 import renderer from 'react-test-renderer'
 import { describe, expect, test } from 'vitest'
-import HelloWorld from './index'
+import HelloWorld from './HelloWorld'
 
 describe('HelloWorld', () => {
   test('HelloWorld component renders correctly', () => {

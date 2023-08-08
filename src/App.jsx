@@ -1,5 +1,5 @@
 import React from 'react'
-import HelloWorld from './lib'
+import HelloWorld from './lib/components/HelloWorld'
 
 const App = () => {
   return (

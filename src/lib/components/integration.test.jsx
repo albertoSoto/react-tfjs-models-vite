@@ -4,7 +4,7 @@
 import * as React from 'react'
 import { render, screen, cleanup } from '@testing-library/react'
 import { describe, expect, test, afterEach } from 'vitest'
-import HelloWorld from './index'
+import HelloWorld from './HelloWorld'
 
 describe('Integration test', () => {
   afterEach(cleanup)

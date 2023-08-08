@@ -1,19 +1,34 @@
 {
-  "name": "react-library-vite",
-  "version": "0.0.0",
-  "description": "A scaffold app for building a React component/library using Vite, ready for publication to npm",
-  "author": "Tom Southall",
-  "keywords": [],
+  "name": "react-tfjs-models",
+  "version": "0.0.1",
+  "description": "React helpers to use with tensorflow js on videos",
+  "author": "Alberto Soto Fernandez",
+  "keywords": [
+    "ML",
+    "tensorflowjs",
+    "react",
+    "video",
+    "posenet",
+    "movenet"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertoSoto/react-tfjs-models-vite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/albertoSoto/react-tfjs-models-vite/issues"
+  },
   "files": [
     "dist",
     "README.md"
   ],
-  "main": "./dist/react-library-vite.umd.js",
-  "module": "./dist/react-library-vite.es.js",
+  "main": "./dist/react-tfjs-models.umd.js",
+  "module": "./dist/react-tfjs-models.es.js",
   "exports": {
     ".": {
-      "import": "./dist/react-library-vite.es.js",
-      "require": "./dist/react-library-vite.umd.js"
+      "import": "./dist/react-tfjs-models.es.js",
+      "require": "./dist/react-tfjs-models.umd.js"
     }
   },
   "scripts": {

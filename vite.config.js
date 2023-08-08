@@ -7,8 +7,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/lib/index.jsx'),
-      name: 'React Library Vite',
-      fileName: (format) => `react-library-vite.${format}.js`
+      name: 'React Tensorflow Js Models',
+      fileName: (format) => `react-tfjs-models.${format}.js`
     },
     rollupOptions: {
       // externalize deps that shouldn't be bundled
