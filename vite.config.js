@@ -4,14 +4,14 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  resolve: {
-    alias: {
-      process: "process/browser",
-      stream: "stream-browserify",
-      zlib: "browserify-zlib",
-      util: 'util'
-    }
-  },
+  // resolve: {
+  //   alias: {
+  //     process: "process/browser",
+  //     stream: "stream-browserify",
+  //     zlib: "browserify-zlib",
+  //     util: 'util'
+  //   }
+  // },
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/lib/index.jsx'),
