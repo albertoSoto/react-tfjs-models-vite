@@ -154,4 +154,4 @@ function drawSkeleton(keypoints, adjacentPairs, ctx) {
       });
 }
 
-export {drawHand, drawPose};
+export {drawHand, drawPose, drawSkeleton, drawKeypoints, drawPath, drawKeypoint, drawPoint};
