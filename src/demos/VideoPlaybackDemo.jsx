@@ -66,7 +66,7 @@ const VideoPlaybackDemo = (props) => {
         <button onClick={fileUploadHandler}>Upload</button>
       </>}
       <VideoPlayback style={style} videoSource={videoSource}
-        setCanvas={setCanvas}>
+        setCanvas={setCanvas} controlsEnabled={true}>
         <BlazePose
           backend='webgl'
           runtime='tfjs'

@@ -19,54 +19,58 @@ import {useEffect, useRef, useState} from 'react';
 import {VideoContext} from './global';
 
 const initVideoState = {
-  video: null,
+    video: null,
 };
 
 const VideoPlayback = (props) => {
-  const videoRef = useRef(null);
-  const sourceRef = useRef(null);
-  const canvasRef = useRef(null);
-  const requestRef = useRef(null);
-  const [videoState, setVideoState] = useState(initVideoState);
-  const {style, videoSource, setCanvas} = props;
+    const videoRef = useRef(null);
+    const sourceRef = useRef(null);
+    const canvasRef = useRef(null);
+    const requestRef = useRef(null);
+    const [videoState, setVideoState] = useState(initVideoState);
+    //TODO ASF 23: pass to tsx or use proptypes
+    const {style, videoSource, setCanvas, controlsEnabled} = props;
+    //let's avoid using the control on the canvas
+    const styleCanvas = {
+        ...style, pointerEvents:"none"
+    }
+    const run = () => {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        setCanvas(canvas);
+        animate();
+    };
 
-  const run = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    setCanvas(canvas);
-    animate();
-  };
+    const animate = () => {
+        setVideoState((prevState) => {
+            return {...prevState, video: videoRef.current};
+        });
+        requestRef.current = requestAnimationFrame(animate);
+    };
 
-  const animate = () => {
-    setVideoState((prevState) => {
-      return {...prevState, video: videoRef.current};
-    });
-    requestRef.current = requestAnimationFrame(animate);
-  };
+    const onEnded = () => {
+        // TODO: dispose the detector.
+    };
 
-  const onEnded = () => {
-    // TODO: dispose the detector.
-  };
+    useEffect(() => {
+        sourceRef.current.src = videoSource;
+        videoRef.current.load();
+    }, [videoSource]);
 
-  useEffect(() => {
-    sourceRef.current.src = videoSource;
-    videoRef.current.load();
-  }, [videoSource]);
-
-  return (
-    <div>
-      <video ref={videoRef} autoPlay onLoadedData={run} onEnded={onEnded}
-        style={style}>
-        <source ref={sourceRef} type="video/mp4"/>
-      </video>
-      <canvas ref={canvasRef} style={style}/>
-      <VideoContext.Provider value={videoState}>
-        {props.children}
-      </VideoContext.Provider>
-    </div>
-  );
+    return (
+        <div>
+            <video ref={videoRef} autoPlay onLoadedData={run} onEnded={onEnded}
+                   style={style} controls={controlsEnabled ? controlsEnabled : true}>
+                <source ref={sourceRef} type="video/mp4"/>
+            </video>
+            <canvas ref={canvasRef} style={styleCanvas}/>
+            <VideoContext.Provider value={videoState}>
+                {props.children}
+            </VideoContext.Provider>
+        </div>
+    );
 };
 
 export default VideoPlayback;
