@@ -1,6 +1,6 @@
 {
   "name": "react-tfjs-models",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "React helpers to use with tensorflow js on videos",
   "author": "Alberto Soto Fernandez",
   "keywords": [
