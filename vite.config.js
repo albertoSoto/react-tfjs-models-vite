@@ -13,7 +13,7 @@ export default defineConfig({
     // },
     resolve: {
         alias: {
-            util: "util",
+            util: require.resolve("util/"),
         },
     },
     build: {
