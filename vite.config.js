@@ -8,9 +8,9 @@ import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    define: {
-        'process.env': process.env ?? {},
-    },
+    // define: {
+    //     'process.env': process.env ?? {},
+    // },
     resolve: {
         alias: {
             util: "util",
@@ -63,7 +63,6 @@ export default defineConfig({
         esbuildOptions: {
             plugins: [
                 NodeGlobalsPolyfillPlugin({ buffer: true }),
-
             ],
             target: "es2020",
         }
