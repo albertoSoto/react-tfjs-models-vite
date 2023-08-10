@@ -1,7 +1,8 @@
 import path from 'path'
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
-
+import EnvironmentPlugin from 'vite-plugin-environment';
+import ViteRequireContext from '@originjs/vite-plugin-require-context';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 // import {nodePolyfills} from 'vite-plugin-node-polyfills'
 import nodePolyfills from 'rollup-plugin-node-polyfills';
@@ -43,7 +44,9 @@ export default defineConfig({
         }
     },
     plugins: [
+        ViteRequireContext(),
         react(),
+        EnvironmentPlugin('all'),
         // nodePolyfills({
         //     // To exclude specific polyfills, add them to this list.
         //     exclude: [
@@ -61,6 +64,10 @@ export default defineConfig({
     ],
     optimizeDeps: {
         esbuildOptions: {
+            // Node.js global to browser globalThis
+            define: {
+                global: 'globalThis',
+            },
             plugins: [
                 NodeGlobalsPolyfillPlugin({ buffer: true }),
             ],
