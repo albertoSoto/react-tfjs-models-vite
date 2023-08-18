@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {useContext, useEffect, useCallback} from 'react';
+import React, {useContext, useEffect, useCallback} from 'react';
 import {VideoContext} from './global';
 import useModel from '../hooks/useModel';
 import BlazePoseLoader from '../models/BlazePoseLoader';
