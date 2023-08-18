@@ -16,11 +16,11 @@
  */
 
 const fingerJoints = {
-  thumb: [0, 1, 2, 3, 4],
-  indexFinger: [0, 5, 6, 7, 8],
-  middleFinger: [0, 9, 10, 11, 12],
-  ringFinger: [0, 13, 14, 15, 16],
-  pinky: [0, 17, 18, 19, 20],
+    thumb: [0, 1, 2, 3, 4],
+    indexFinger: [0, 5, 6, 7, 8],
+    middleFinger: [0, 9, 10, 11, 12],
+    ringFinger: [0, 13, 14, 15, 16],
+    pinky: [0, 17, 18, 19, 20],
 };
 
 const scoreThreshold = 0.65;
@@ -31,20 +31,20 @@ const scoreThreshold = 0.65;
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawHand(landmarks, ctx) {
-  for (let j = 0; j < Object.keys(fingerJoints).length; j++) {
-    const finger = Object.keys(fingerJoints)[j];
-    //  Loop through pairs of joints
-    for (let k = 0; k < fingerJoints[finger].length - 1; k++) {
-      // Get pairs of joints
-      const firstJointIndex = fingerJoints[finger][k];
-      const secondJointIndex = fingerJoints[finger][k + 1];
-      drawPath(landmarks[firstJointIndex], landmarks[secondJointIndex], ctx);
+    for (let j = 0; j < Object.keys(fingerJoints).length; j++) {
+        const finger = Object.keys(fingerJoints)[j];
+        //  Loop through pairs of joints
+        for (let k = 0; k < fingerJoints[finger].length - 1; k++) {
+            // Get pairs of joints
+            const firstJointIndex = fingerJoints[finger][k];
+            const secondJointIndex = fingerJoints[finger][k + 1];
+            drawPath(landmarks[firstJointIndex], landmarks[secondJointIndex], ctx);
+        }
     }
-  }
 
-  landmarks.forEach((landmark) => {
-    drawPoint(landmark[0], landmark[1], ctx);
-  });
+    landmarks.forEach((landmark) => {
+        drawPoint(landmark[0], landmark[1], ctx);
+    });
 }
 
 /**
@@ -54,10 +54,10 @@ function drawHand(landmarks, ctx) {
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawPoint(x, y, ctx) {
-  ctx.beginPath();
-  ctx.arc(x, y, 3, 0, 2 * Math.PI);
-  ctx.fillStyle = 'red';
-  ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, 2 * Math.PI);
+    ctx.fillStyle = 'red';
+    ctx.fill();
 }
 
 /**
@@ -67,12 +67,12 @@ function drawPoint(x, y, ctx) {
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawPath(from, to, ctx) {
-  ctx.beginPath();
-  ctx.moveTo(from[0], from[1]);
-  ctx.lineTo(to[0], to[1]);
-  ctx.strokeStyle = 'lime';
-  ctx.lineWidth = 4;
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(from[0], from[1]);
+    ctx.lineTo(to[0], to[1]);
+    ctx.strokeStyle = 'lime';
+    ctx.lineWidth = 4;
+    ctx.stroke();
 }
 
 /**
@@ -82,10 +82,59 @@ function drawPath(from, to, ctx) {
  * @param {Array<Object>} adjacentPairs
  * @param {CanvasRenderingContext2D} ctx
  */
+
+let lazy = false;
+
 function drawPose(predictions, keypointIndices, adjacentPairs, ctx) {
-  const keypoints = predictions.keypoints;
-  drawKeypoints(keypoints, keypointIndices, ctx);
-  drawSkeleton(keypoints, adjacentPairs, ctx);
+    //size for a canvas with width and height is under ctx.canvas.width && ctx.canvas.height
+    const keypoints = predictions.keypoints;
+    const normalizedKeypoints = resizeKeypoints(keypoints)
+    if (!lazy) {
+        console.log("analisis point!")
+        console.log(keypoints)
+        console.log(normalizedKeypoints)
+        lazy = true;
+    }
+    drawKeypoints(normalizedKeypoints, keypointIndices, ctx);
+    drawSkeleton(normalizedKeypoints, adjacentPairs, ctx);
+}
+
+function resizeKeypoints(keypoints) {
+    //import {calculators} from "@tensorflow-models/pose-detection";
+    //calculators.keypointsToNormalizedKeypoints(keypoints, {height: 640, width: 480})
+    return keypoints.map(kp => resizeValueIfCanvasResized(kp))
+}
+
+/**
+ *
+ * For the `keypoints`, x and y represent the actual keypoint position in the image.
+ * If you need normalized keypoint positions, you can use the method
+ * `poseDetection.calculators.keypointsToNormalizedKeypoints(keypoints, imageSize)` to
+ *
+ * [MoveNet Documentation](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/src/movenet)
+ * [BlazePose TFJS Documentation](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/src/blazepose_tfjs)
+ *
+ * Modifies original keypoint value for dynamic canvas
+ * @param keypoint pose keypoint
+ * @returns {*&{x: number, y: number}}
+ */
+function resizeValueIfCanvasResized(keypoint) {
+    return {
+        ...keypoint,
+        x: resizeCoordinate(keypoint.x, 1280, 640),
+        y: resizeCoordinate(keypoint.y, 720, 480)
+    }
+}
+
+/**
+ * Adjust full video coordinate to custom coordinate for width or height
+ * @param canvasCoordinate dynamic Value for pose
+ * @param fullSize fullWidth or fullHeight
+ * @param customSize customWidth or customHeight
+ * @returns {number}
+ */
+function resizeCoordinate(canvasCoordinate, fullSize, customSize) {
+    return (canvasCoordinate * customSize) / fullSize;
 }
 
 /**
@@ -96,17 +145,17 @@ function drawPose(predictions, keypointIndices, adjacentPairs, ctx) {
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawKeypoints(keypoints, keypointIndices, ctx) {
-  for (const i of keypointIndices.middle) {
-    drawKeypoint(keypoints[i], 'yellow', ctx);
-  }
+    for (const i of keypointIndices.middle) {
+        drawKeypoint(keypoints[i], 'yellow', ctx);
+    }
 
-  for (const i of keypointIndices.left) {
-    drawKeypoint(keypoints[i], 'lime', ctx);
-  }
+    for (const i of keypointIndices.left) {
+        drawKeypoint(keypoints[i], 'lime', ctx);
+    }
 
-  for (const i of keypointIndices.right) {
-    drawKeypoint(keypoints[i], 'red', ctx);
-  }
+    for (const i of keypointIndices.right) {
+        drawKeypoint(keypoints[i], 'red', ctx);
+    }
 }
 
 /**

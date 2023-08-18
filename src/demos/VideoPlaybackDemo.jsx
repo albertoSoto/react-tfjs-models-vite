@@ -16,9 +16,9 @@
  */
 
 import './VideoPlaybackDemo.css';
-import {useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import * as posedetection from '@tensorflow-models/pose-detection';
-import {drawPose} from '../lib/utils/handpose';
+import {drawPose} from '../lib';
 import MoveNetLoader from '../lib/models/MoveNetLoader';
 import VideoPlayback from '../lib/components/VideoPlayback';
 import BlazePose from '../lib/components/BlazePose';
@@ -38,7 +38,7 @@ const VideoPlaybackDemo = (props) => {
     zIndex: 9,
   };
 
-  const [videoSource, setVideoSource] = useState(null);
+  const [videoSource, setVideoSource] = useState("/climbing.mp4");
 
   const fileSelectedHandler = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -48,15 +48,21 @@ const VideoPlaybackDemo = (props) => {
     setVideoSource(URL.createObjectURL(selectedFile));
   };
 
+  let isPoseShown = false;
   const onPoseEstimate = (pose) => {
     const ctx = canvasRef.current.getContext('2d');
     const canvas = canvasRef.current;
+    if (!isPoseShown){
+      console.log(pose);
+      isPoseShown = true;
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPose(pose, keypointIndices, adjacentPairs, ctx);
   };
 
   const setCanvas = (canvas) => {
     canvasRef.current = canvas;
+    console.log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
   };
 
   return (
@@ -66,7 +72,7 @@ const VideoPlaybackDemo = (props) => {
         <button onClick={fileUploadHandler}>Upload</button>
       </>}
       <VideoPlayback style={style} videoSource={videoSource}
-        setCanvas={setCanvas} controlsEnabled={true}>
+        setCanvas={setCanvas} controlsEnabled={false} width={640} height={480}>
         <BlazePose
           backend='webgl'
           runtime='tfjs'

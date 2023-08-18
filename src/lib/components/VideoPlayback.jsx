@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {VideoContext} from './global';
+import './VideoPlayback.css';
+//import {calculators} from "@tensorflow-models/pose-detection";
 
 const initVideoState = {
     video: null,
@@ -29,16 +31,21 @@ const VideoPlayback = (props) => {
     const requestRef = useRef(null);
     const [videoState, setVideoState] = useState(initVideoState);
     //TODO ASF 23: pass to tsx or use proptypes
-    const {style, videoSource, setCanvas, controlsEnabled} = props;
+    const {style, videoSource, setCanvas, controlsEnabled, width, height} = props;
     //let's avoid using the control on the canvas
     const styleCanvas = {
-        ...style, pointerEvents:"none"
+        ...style, pointerEvents: "none"
     }
     const run = () => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        const isResized = width && video && video.videoWidth && video.videoWidth !== width;
+        //TODO ASF 23: it takes the video original width and height, let´s adapt it f
+        canvas.width = width ? width : video.videoWidth;
+        canvas.height = height ? height : video.videoHeight;
+        console.log(`Video Size is ${video.videoWidth}x${video.videoHeight}`)
+        console.log(`Working with a canvas size ${canvas.width}x${canvas.height}`)
+        console.log(`Video resized?${isResized}`);
         setCanvas(canvas);
         animate();
     };
@@ -60,12 +67,12 @@ const VideoPlayback = (props) => {
     }, [videoSource]);
 
     return (
-        <div>
+        <div className="video-canvas-container">
             <video ref={videoRef} autoPlay onLoadedData={run} onEnded={onEnded}
-                   style={style} controls={controlsEnabled ? controlsEnabled : true}>
-                <source ref={sourceRef} type="video/mp4"/>
+                   style={style} controls={controlsEnabled ? controlsEnabled : true} width={width} height={height}>
+                <source ref={sourceRef} type="video/mp4" width={width} height={height}/>
             </video>
-            <canvas ref={canvasRef} style={styleCanvas}/>
+            <canvas ref={canvasRef} className="canvas-overlay" style={styleCanvas}/>
             <VideoContext.Provider value={videoState}>
                 {props.children}
             </VideoContext.Provider>

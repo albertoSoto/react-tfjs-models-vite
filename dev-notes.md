@@ -1,3 +1,17 @@
+## Base tutorial
+https://blog.tensorflow.org/2021/08/3d-pose-detection-with-mediapipe-blazepose-ghum-tfjs.html
+https://github.com/tensorflow/tfjs-models/blob/master/pose-detection/demos/upload_video/src/index.js    
+https://github.com/tensorflow/tfjs-models/blob/3dbb02145c9d4dfa596fd3b487c725f2e19134c2/pose-detection/demos/upload_video/src/camera.js#L106
+
+
+https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/web_js
+https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/src/movenet
+https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/src/blazepose_tfjs
+https://blog.tensorflow.org/2021/08/3d-pose-detection-with-mediapipe-blazepose-ghum-tfjs.html
+
+## JSX to TSX
+https://blog.echobind.com/post/convert-a-react-component-to-typescript
+
 ## Plugin development with Rollup
 https://javascript.plainenglish.io/tutorial-create-your-own-component-library-with-react-and-rollup-b8978d885297
 

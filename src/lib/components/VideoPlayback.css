@@ -1,0 +1,12 @@
+.video-canvas-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
