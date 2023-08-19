@@ -85,28 +85,30 @@ function drawPath(from, to, ctx) {
 
 let lazy = false;
 
-function drawPose(predictions, keypointIndices, adjacentPairs, ctx, resizeValues) {
+function drawPose(predictions, keypointIndices, adjacentPairs, ctx, resizeValues, originalValues) {
     //size for a canvas with width and height is under ctx.canvas.width && ctx.canvas.height
     const keypoints = predictions.keypoints;
-    const normalizedKeypoints = resizeKeypoints(keypoints, resizeValues)
+    const doResizeKeypoints = originalValues && originalValues.width && originalValues.height
+        && resizeValues.width && resizeValues.height;
+    const normalizedKeypoints =  doResizeKeypoints? resizeKeypoints(keypoints, resizeValues, originalValues) : null;
     if (!lazy) {
         console.log(`analisis point!${resizeValues.width}x${resizeValues.height}`)
         console.log(keypoints)
         console.log(normalizedKeypoints)
         lazy = true;
     }
-    drawKeypoints(normalizedKeypoints, keypointIndices, ctx);
-    drawSkeleton(normalizedKeypoints, adjacentPairs, ctx);
+    drawKeypoints(normalizedKeypoints ? normalizedKeypoints : keypoints, keypointIndices, ctx);
+    drawSkeleton(normalizedKeypoints ? normalizedKeypoints : keypoints, adjacentPairs, ctx);
 }
 
 function getCustomHeightWithOriginalAspectRatio(originalWidth, originalHeight, customWidth) {
-    return customWidth*originalHeight/originalWidth;
+    return customWidth * originalHeight / originalWidth;
 }
 
-function resizeKeypoints(keypoints, resizeValues) {
+function resizeKeypoints(keypoints, resizeValues, originalValues) {
     //import {calculators} from "@tensorflow-models/pose-detection";
     //calculators.keypointsToNormalizedKeypoints(keypoints, {height: 640, width: 480})
-    return keypoints.map(kp => resizeValueIfCanvasResized(kp, resizeValues))
+    return keypoints.map(kp => resizeValueIfCanvasResized(kp, resizeValues, originalValues))
 }
 
 /**
@@ -122,11 +124,11 @@ function resizeKeypoints(keypoints, resizeValues) {
  * @param keypoint pose keypoint
  * @returns {*&{x: number, y: number}}
  */
-function resizeValueIfCanvasResized(keypoint, resizeValues) {
+function resizeValueIfCanvasResized(keypoint, resizeValues, originalValues) {
     return {
         ...keypoint,
-        x: resizeCoordinate(keypoint.x, 1280, resizeValues.width),
-        y: resizeCoordinate(keypoint.y, 720, resizeValues.height)
+        x: resizeCoordinate(keypoint.x, originalValues.width, resizeValues.width),
+        y: resizeCoordinate(keypoint.y, originalValues.height, resizeValues.height)
     }
 }
 
@@ -207,4 +209,13 @@ function drawSkeleton(keypoints, adjacentPairs, ctx) {
         });
 }
 
-export {drawHand, drawPose, drawSkeleton, drawKeypoints, drawPath, drawKeypoint, drawPoint, getCustomHeightWithOriginalAspectRatio};
+export {
+    drawHand,
+    drawPose,
+    drawSkeleton,
+    drawKeypoints,
+    drawPath,
+    drawKeypoint,
+    drawPoint,
+    getCustomHeightWithOriginalAspectRatio
+};

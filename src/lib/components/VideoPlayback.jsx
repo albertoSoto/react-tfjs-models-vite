@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useImperativeHandle} from 'react';
 import {VideoContext} from './global';
 import './VideoPlayback.css';
 import {getCustomHeightWithOriginalAspectRatio} from "../utils/handpose";
 
 const initVideoState = {
     video: null,
+    height: null
 };
 
-const VideoPlayback = (props) => {
+const VideoPlayback = (props, ref) => {
     const videoRef = useRef(null);
     const sourceRef = useRef(null);
     const canvasRef = useRef(null);
     const requestRef = useRef(null);
     const [videoState, setVideoState] = useState(initVideoState);
     //TODO ASF 23: pass to tsx or use proptypes
-    const {style, videoSource, setCanvas, controlsEnabled, width, height} = props;
+    const {style, videoSource, setCanvas, controlsEnabled, width} = props;
     //let's avoid using the control on the canvas
     const styleCanvas = {
         ...style, pointerEvents: "none"
@@ -42,7 +43,8 @@ const VideoPlayback = (props) => {
         const isResized = width && video && video.videoWidth && video.videoWidth !== width;
         //TODO ASF 23: it takes the video original width and height, let´s adapt it f
         canvas.width = width ? width : video.videoWidth;
-        canvas.height = width ? getCustomHeightWithOriginalAspectRatio(video.videoWidth,video.videoHeight,width) : video.videoHeight;
+        canvas.height = width ? getCustomHeightWithOriginalAspectRatio(video.videoWidth, video.videoHeight, width) : video.videoHeight;
+        videoState.height = canvas.height;
         console.log(`Video Size is ${video.videoWidth}x${video.videoHeight}`)
         console.log(`Working with a canvas size ${canvas.width}x${canvas.height}`)
         console.log(`Video resized?${isResized}`);
@@ -50,6 +52,16 @@ const VideoPlayback = (props) => {
         animate();
     };
 
+    //https://timmousk.com/blog/react-call-function-in-child-component/#:~:text=To%20call%20a%20child's%20function%20from%20a%20parent%20component%2C%20you,it%20modifies%20a%20created%20reference.
+    useImperativeHandle(ref, () => ({
+        getVideo() {
+            try {
+                return videoRef.current;
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }));
     const animate = () => {
         setVideoState((prevState) => {
             return {...prevState, video: videoRef.current};
@@ -69,8 +81,9 @@ const VideoPlayback = (props) => {
     return (
         <div className="video-canvas-container">
             <video ref={videoRef} autoPlay onLoadedData={run} onEnded={onEnded}
-                   style={style} controls={controlsEnabled ? controlsEnabled : true} width={width} height={height}>
-                <source ref={sourceRef} type="video/mp4" width={width} height={height}/>
+                   style={style} controls={controlsEnabled ? controlsEnabled : true} width={width}
+                   height={videoState.height}>
+                <source ref={sourceRef} type="video/mp4" width={width} height={videoState.height}/>
             </video>
             <canvas ref={canvasRef} className="canvas-overlay" style={styleCanvas}/>
             <VideoContext.Provider value={videoState}>
@@ -80,4 +93,4 @@ const VideoPlayback = (props) => {
     );
 };
 
-export default VideoPlayback;
+export default React.forwardRef(VideoPlayback);

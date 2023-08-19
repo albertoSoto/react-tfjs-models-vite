@@ -23,67 +23,94 @@ import MoveNetLoader from '../lib/models/MoveNetLoader';
 import VideoPlayback from '../lib/components/VideoPlayback';
 import BlazePose from '../lib/components/BlazePose';
 
-const VideoPlaybackDemo = (props) => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const canvasRef = useRef(null);
-  const model = posedetection.SupportedModels.MoveNet;
-  const keypointIndices = posedetection.util.getKeypointIndexBySide(model);
-  const adjacentPairs = posedetection.util.getAdjacentPairs(model);
+const VideoPlaybackDemo = () => {
+    const [selectedFile, setSelectedFile] = useState(null);
+    // const [originalSize, setOriginalSize] = useState({
+    //     width: null,
+    //     height: null
+    // });
+    const [originalSize, setOriginalSize] = useState({
+        width: 1280,
+        height: 720
+    });
+    const canvasRef = useRef(null);
+    const videoPlaybackRef = useRef(null);
+    const model = posedetection.SupportedModels.MoveNet;
+    const keypointIndices = posedetection.util.getKeypointIndexBySide(model);
+    const adjacentPairs = posedetection.util.getAdjacentPairs(model);
 
-  const style = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 9,
-  };
+    const style = {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 9,
+    };
 
-  const [videoSource, setVideoSource] = useState("/climbing.mp4");
+    const [videoSource, setVideoSource] = useState("/climbing.mp4");
 
-  const fileSelectedHandler = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
+    const fileSelectedHandler = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
 
-  const fileUploadHandler = () => {
-    setVideoSource(URL.createObjectURL(selectedFile));
-  };
+    const fileUploadHandler = () => {
+        setVideoSource(URL.createObjectURL(selectedFile));
+    };
 
-  let isPoseShown = false;
-  const onPoseEstimate = (pose) => {
-    const ctx = canvasRef.current.getContext('2d');
-    const canvas = canvasRef.current;
-    if (!isPoseShown){
-      console.log(pose);
-      isPoseShown = true;
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawPose(pose, keypointIndices, adjacentPairs, ctx, {width:canvas.width, height:canvas.height});
-  };
+    let isPoseShown = false;
+    const onPoseEstimate = (pose) => {
+        const ctx = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        if (!originalSize) {
+            setOriginalSize({
+                width: 1280,
+                height: 720
+            })
+            // setOriginalSize({
+            //     width: videoPlaybackRef.current.getVideo() ? videoPlaybackRef.current.getVideo().videoWidth : null,
+            //     height: videoPlaybackRef.current.getVideo() ? videoPlaybackRef.current.getVideo().videoHeight : null
+            // })
+        }
+        if (!isPoseShown) {
+            console.log(pose);
+            console.log(originalSize)
+            isPoseShown = true;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const setCanvas = (canvas) => {
-    canvasRef.current = canvas;
-    console.log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
-  };
+        drawPose(pose,
+            keypointIndices,
+            adjacentPairs,
+            ctx,
+            {width: canvas.width, height: canvas.height},
+            originalSize
+        );
+    };
 
-  return (
-    <div className="App">
-      {videoSource == null && <>
-        <input type="file" onChange={fileSelectedHandler} accept="video/*"/>
-        <button onClick={fileUploadHandler}>Upload</button>
-      </>}
-      <VideoPlayback style={style} videoSource={videoSource}
-        setCanvas={setCanvas} controlsEnabled={false} width={640} >
-        <BlazePose
-          backend='webgl'
-          runtime='tfjs'
-          type={posedetection.movenet.modelType.SINGLEPOSE_THUNDER}
-          maxPoses={1}
-          flipHorizontal={true}
-          loader={MoveNetLoader}
-          onPoseEstimate={onPoseEstimate}/>
-      </VideoPlayback>
-    </div>
-  );
+    const setCanvas = (canvas) => {
+        canvasRef.current = canvas;
+        console.log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
+    };
+
+    return (
+        <div className="App">
+            {videoSource == null && <>
+                <input type="file" onChange={fileSelectedHandler} accept="video/*"/>
+                <button onClick={fileUploadHandler}>Upload</button>
+            </>}
+            <VideoPlayback style={style} videoSource={videoSource} ref={videoPlaybackRef}
+                           setCanvas={setCanvas} controlsEnabled={false} width={600}>
+                <BlazePose
+                    backend='webgl'
+                    runtime='tfjs'
+                    type={posedetection.movenet.modelType.SINGLEPOSE_THUNDER}
+                    maxPoses={1}
+                    flipHorizontal={true}
+                    loader={MoveNetLoader}
+                    onPoseEstimate={onPoseEstimate}/>
+            </VideoPlayback>
+        </div>
+    );
 };
 
 export default VideoPlaybackDemo;
