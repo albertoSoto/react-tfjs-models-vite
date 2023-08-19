@@ -18,7 +18,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {VideoContext} from './global';
 import './VideoPlayback.css';
-//import {calculators} from "@tensorflow-models/pose-detection";
+import {getCustomHeightWithOriginalAspectRatio} from "../utils/handpose";
 
 const initVideoState = {
     video: null,
@@ -42,7 +42,7 @@ const VideoPlayback = (props) => {
         const isResized = width && video && video.videoWidth && video.videoWidth !== width;
         //TODO ASF 23: it takes the video original width and height, let´s adapt it f
         canvas.width = width ? width : video.videoWidth;
-        canvas.height = height ? height : video.videoHeight;
+        canvas.height = width ? getCustomHeightWithOriginalAspectRatio(video.videoWidth,video.videoHeight,width) : video.videoHeight;
         console.log(`Video Size is ${video.videoWidth}x${video.videoHeight}`)
         console.log(`Working with a canvas size ${canvas.width}x${canvas.height}`)
         console.log(`Video resized?${isResized}`);

@@ -57,7 +57,7 @@ const VideoPlaybackDemo = (props) => {
       isPoseShown = true;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawPose(pose, keypointIndices, adjacentPairs, ctx);
+    drawPose(pose, keypointIndices, adjacentPairs, ctx, {width:canvas.width, height:canvas.height});
   };
 
   const setCanvas = (canvas) => {
@@ -72,7 +72,7 @@ const VideoPlaybackDemo = (props) => {
         <button onClick={fileUploadHandler}>Upload</button>
       </>}
       <VideoPlayback style={style} videoSource={videoSource}
-        setCanvas={setCanvas} controlsEnabled={false} width={640} height={480}>
+        setCanvas={setCanvas} controlsEnabled={false} width={640} >
         <BlazePose
           backend='webgl'
           runtime='tfjs'

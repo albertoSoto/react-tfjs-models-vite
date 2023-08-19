@@ -85,12 +85,12 @@ function drawPath(from, to, ctx) {
 
 let lazy = false;
 
-function drawPose(predictions, keypointIndices, adjacentPairs, ctx) {
+function drawPose(predictions, keypointIndices, adjacentPairs, ctx, resizeValues) {
     //size for a canvas with width and height is under ctx.canvas.width && ctx.canvas.height
     const keypoints = predictions.keypoints;
-    const normalizedKeypoints = resizeKeypoints(keypoints)
+    const normalizedKeypoints = resizeKeypoints(keypoints, resizeValues)
     if (!lazy) {
-        console.log("analisis point!")
+        console.log(`analisis point!${resizeValues.width}x${resizeValues.height}`)
         console.log(keypoints)
         console.log(normalizedKeypoints)
         lazy = true;
@@ -99,10 +99,14 @@ function drawPose(predictions, keypointIndices, adjacentPairs, ctx) {
     drawSkeleton(normalizedKeypoints, adjacentPairs, ctx);
 }
 
-function resizeKeypoints(keypoints) {
+function getCustomHeightWithOriginalAspectRatio(originalWidth, originalHeight, customWidth) {
+    return customWidth*originalHeight/originalWidth;
+}
+
+function resizeKeypoints(keypoints, resizeValues) {
     //import {calculators} from "@tensorflow-models/pose-detection";
     //calculators.keypointsToNormalizedKeypoints(keypoints, {height: 640, width: 480})
-    return keypoints.map(kp => resizeValueIfCanvasResized(kp))
+    return keypoints.map(kp => resizeValueIfCanvasResized(kp, resizeValues))
 }
 
 /**
@@ -118,11 +122,11 @@ function resizeKeypoints(keypoints) {
  * @param keypoint pose keypoint
  * @returns {*&{x: number, y: number}}
  */
-function resizeValueIfCanvasResized(keypoint) {
+function resizeValueIfCanvasResized(keypoint, resizeValues) {
     return {
         ...keypoint,
-        x: resizeCoordinate(keypoint.x, 1280, 640),
-        y: resizeCoordinate(keypoint.y, 720, 480)
+        x: resizeCoordinate(keypoint.x, 1280, resizeValues.width),
+        y: resizeCoordinate(keypoint.y, 720, resizeValues.height)
     }
 }
 
@@ -165,13 +169,13 @@ function drawKeypoints(keypoints, keypointIndices, ctx) {
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawKeypoint(keypoint, color, ctx) {
-  const score = keypoint.score != null ? keypoint.score : 1;
-  if (score >= scoreThreshold) {
-    ctx.beginPath();
-    ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
+    const score = keypoint.score != null ? keypoint.score : 1;
+    if (score >= scoreThreshold) {
+        ctx.beginPath();
+        ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
 }
 
 /**
@@ -181,26 +185,26 @@ function drawKeypoint(keypoint, color, ctx) {
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawSkeleton(keypoints, adjacentPairs, ctx) {
-  ctx.fillStyle = 'White';
-  ctx.strokeStyle = 'White';
-  ctx.lineWidth = 3;
+    ctx.fillStyle = 'White';
+    ctx.strokeStyle = 'White';
+    ctx.lineWidth = 3;
 
-  adjacentPairs
-      .forEach(([i, j]) => {
-        const kp1 = keypoints[i];
-        const kp2 = keypoints[j];
+    adjacentPairs
+        .forEach(([i, j]) => {
+            const kp1 = keypoints[i];
+            const kp2 = keypoints[j];
 
-        // If score is null, just show the keypoint.
-        const score1 = kp1.score != null ? kp1.score : 1;
-        const score2 = kp2.score != null ? kp2.score : 1;
+            // If score is null, just show the keypoint.
+            const score1 = kp1.score != null ? kp1.score : 1;
+            const score2 = kp2.score != null ? kp2.score : 1;
 
-        if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
-          ctx.beginPath();
-          ctx.moveTo(kp1.x, kp1.y);
-          ctx.lineTo(kp2.x, kp2.y);
-          ctx.stroke();
-        }
-      });
+            if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
+                ctx.beginPath();
+                ctx.moveTo(kp1.x, kp1.y);
+                ctx.lineTo(kp2.x, kp2.y);
+                ctx.stroke();
+            }
+        });
 }
 
-export {drawHand, drawPose, drawSkeleton, drawKeypoints, drawPath, drawKeypoint, drawPoint};
+export {drawHand, drawPose, drawSkeleton, drawKeypoints, drawPath, drawKeypoint, drawPoint, getCustomHeightWithOriginalAspectRatio};
