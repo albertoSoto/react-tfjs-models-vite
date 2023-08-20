@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Webcam from 'react-webcam';
 import {VideoContext} from './global';
 

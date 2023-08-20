@@ -19,7 +19,7 @@ import Camera from '../lib/components/Camera';
 import BlazePose from '../lib/components/BlazePose';
 import {Canvas} from '@react-three/fiber';
 import Mousy from '../lib/components/Mousy';
-import {Suspense, useRef} from 'react';
+import React, {Suspense, useRef} from 'react';
 
 const style = {
   position: 'absolute',

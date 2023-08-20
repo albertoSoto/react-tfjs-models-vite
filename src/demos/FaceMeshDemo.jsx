@@ -17,6 +17,7 @@
 
 import Camera from '../lib/components/Camera';
 import FaceMesh from '../lib/components/FaceMesh';
+import React from 'react';
 
 const style = {
   position: 'absolute',

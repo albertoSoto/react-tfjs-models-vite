@@ -7,38 +7,49 @@ image classification, pose detection, face detection, body segmentation and more
 Comparing to integrating the underlying library, this project provides various supports for non-machine learning
 experts to use these models in their Rect applications.
 
-The model implements a proper approach for Movenet model on pose detection which is accurate
+The model implements a proper approach for Movenet && Blaze model on pose detection which is accurate
 The model variations are adaptative and it renders the canvas with the controls over the video if desired.
-Styling is adaptative to needs and 
+Styling is adaptative to needs
+
 
 ## Usage example
 
-Working project located 
+Working project located under src/demos/VideoPlaybackDemo.jsx with the following code as example of use
+
+Considerations:
+
+- The video component contains a recalculation for poses according to aspect ratio of the video with it's original size
+  To use the recalculation, just add the width parameter in VideoPlayback component
+- Provided example contains a climbing video
+- Blazepose component needs to be adjusted to your needs, as it works as a loader for movenet or blaze models
+    In this case, use the valid import for MovenetLoader or BlazePoseLoader
+```jsx
+    // loader={BlazePoseLoader}
+    // type={"full"}
+    loader={MoveNetLoader}
+    type={posedetection.movenet.modelType.SINGLEPOSE_THUNDER}
+```
 
 ```jsx
-import React from "react";
-import "./styles.css";
 
-import * as PoseDetector from '@tensorflow-models/pose-detection';
-import {BlazePose, VideoPlayback, drawPose, MoveNetLoader} from "react-tfjs-models";
+import './VideoPlaybackDemo.css';
+import React, {useRef, useState} from 'react';
+import * as posedetection from '@tensorflow-models/pose-detection';
+import {drawPose} from '../lib';
+import MoveNetLoader from '../lib/models/MoveNetLoader';
+// import BlazePoseLoader from '../lib/models/BlazePoseLoader';
+import VideoPlayback from '../lib/components/VideoPlayback';
+import BlazePose from '../lib/components/BlazePose';
+import log from '../lib/utils/logger'
+const VideoPlaybackDemo = () => {
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [originalSize, setOriginalSize] = useState(null);
+    const canvasRef = useRef(null);
+    const videoPlaybackRef = useRef(null);
+    const model = posedetection.SupportedModels.MoveNet;
+    const keypointIndices = posedetection.util.getKeypointIndexBySide(model);
+    const adjacentPairs = posedetection.util.getAdjacentPairs(model);
 
-export default function App() {
-    // const videoID = "videoElementId";
-    // const videoRef = React.useRef(null);
-    const canvasRef = React.useRef(null);
-    const videoSource = "climbing.mp4";
-    const model = PoseDetector.SupportedModels.MoveNet;
-    const keypointIndices = PoseDetector.util.getKeypointIndexBySide(model);
-    const adjacentPairs = PoseDetector.util.getAdjacentPairs(model);
-    const setCanvas = (canvas) => {
-        canvasRef.current = canvas;
-    };
-    const onPoseEstimate = (pose) => {
-        const ctx = canvasRef.current.getContext('2d');
-        const canvas = canvasRef.current;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawPose(pose, keypointIndices, adjacentPairs, ctx);
-    };
     const style = {
         position: 'absolute',
         top: 0,
@@ -46,20 +57,68 @@ export default function App() {
         right: 0,
         zIndex: 9,
     };
+
+    const [videoSource, setVideoSource] = useState("/climbing.mp4");
+
+    const fileSelectedHandler = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const fileUploadHandler = () => {
+        setVideoSource(URL.createObjectURL(selectedFile));
+    };
+
+    let isPoseShown = false;
+    const onPoseEstimate = (pose) => {
+        const ctx = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        if (!isPoseShown) {
+            log(pose);
+            log(originalSize);
+            isPoseShown = true;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawPose(pose,
+            keypointIndices,
+            adjacentPairs,
+            ctx,
+            {width: canvas.width, height: canvas.height},
+            originalSize
+        );
+    };
+
+    const setCanvas = (canvas) => {
+        canvasRef.current = canvas;
+        log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
+    };
+
     return (
-        <VideoPlayback style={style} videoSource={videoSource}
-                       setCanvas={setCanvas} controlsEnabled={true}>
-            <BlazePose
-                backend='webgl'
-                runtime='tfjs'
-                type={PoseDetector.movenet.modelType.SINGLEPOSE_THUNDER}
-                maxPoses={1}
-                flipHorizontal={true}
-                loader={MoveNetLoader}
-                onPoseEstimate={onPoseEstimate}/>
-        </VideoPlayback>
+        <div className="App">
+            {videoSource == null && <>
+                <input type="file" onChange={fileSelectedHandler} accept="video/*"/>
+                <button onClick={fileUploadHandler}>Upload</button>
+            </>}
+            <VideoPlayback style={style} videoSource={videoSource} ref={videoPlaybackRef}
+                           setCanvas={setCanvas} controlsEnabled={false} width={900}
+                           setOriginalVideoSize={setOriginalSize}>
+                <BlazePose
+                    backend='webgl'
+                    runtime='tfjs'
+                    // loader={BlazePoseLoader}
+                    // type={"full"}
+                    loader={MoveNetLoader}
+                    type={posedetection.movenet.modelType.SINGLEPOSE_THUNDER}
+                    maxPoses={1}
+                    flipHorizontal={true}
+                    onPoseEstimate={onPoseEstimate}
+                />
+            </VideoPlayback>
+        </div>
     );
-}
+};
+
+export default VideoPlaybackDemo;
 ```
 
 
@@ -67,7 +126,7 @@ export default function App() {
 
 This project has been updated and forked from https://github.com/SeedV/react-tfjs-models
 The adaptation has been really though, but now, is reusable for external project so I would like to share with the community
-Adapted using vite with specific polyfills
+Adapted using vite with specific polyfills and included adaptative behaviour for aspect ratio insted of original video size
 
 
 ## React components hierarchy
@@ -103,10 +162,10 @@ elements and convert the extracted frame into a Rect state.
 
 `react-tfjs-models` provides the below components as input layer:
 
-| Component | Description |
-| --------- | ----------- |
-| Camera | A webcam that provides video source to the model. |
-| VideoPlayback | A video extractor that send video frames. |
+| Component | Description                                                                  |
+| --------- |------------------------------------------------------------------------------|
+| Camera | A webcam that provides video source to the model.                            |
+| VideoPlayback | A video extractor that send video frames. <br/>Width parameter adjusts video size |
 
 ### Model layer
 

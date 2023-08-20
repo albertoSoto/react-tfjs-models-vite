@@ -17,7 +17,7 @@
 
 import Camera from '../lib/components/Camera';
 import fp from 'fingerpose';
-import {useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {rock, paper, scissor} from '../lib/utils/gesture';
 import HandPose from '../lib/components/HandPose';
 
