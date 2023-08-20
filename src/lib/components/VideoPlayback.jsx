@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2021-2022 The SeedV Lab.
+ * Copyright 2023 Alberto Soto - LINCE PLUS
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -32,7 +33,8 @@ const VideoPlayback = (props, ref) => {
     const requestRef = useRef(null);
     const [videoState, setVideoState] = useState(initVideoState);
     //TODO ASF 23: pass to tsx or use proptypes
-    const {style, videoSource, setCanvas, controlsEnabled, width} = props;
+    const {style, videoSource, setCanvas, controlsEnabled, width, setOriginalVideoSize} = props;
+
     //let's avoid using the control on the canvas
     const styleCanvas = {
         ...style, pointerEvents: "none"
@@ -41,7 +43,6 @@ const VideoPlayback = (props, ref) => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
         const isResized = width && video && video.videoWidth && video.videoWidth !== width;
-        //TODO ASF 23: it takes the video original width and height, let´s adapt it f
         canvas.width = width ? width : video.videoWidth;
         canvas.height = width ? getCustomHeightWithOriginalAspectRatio(video.videoWidth, video.videoHeight, width) : video.videoHeight;
         videoState.height = canvas.height;
@@ -52,16 +53,6 @@ const VideoPlayback = (props, ref) => {
         animate();
     };
 
-    //https://timmousk.com/blog/react-call-function-in-child-component/#:~:text=To%20call%20a%20child's%20function%20from%20a%20parent%20component%2C%20you,it%20modifies%20a%20created%20reference.
-    useImperativeHandle(ref, () => ({
-        getVideo() {
-            try {
-                return videoRef.current;
-            } catch (e) {
-                console.log(e)
-            }
-        }
-    }));
     const animate = () => {
         setVideoState((prevState) => {
             return {...prevState, video: videoRef.current};
@@ -72,11 +63,26 @@ const VideoPlayback = (props, ref) => {
     const onEnded = () => {
         // TODO: dispose the detector.
     };
-
+    const updateOriginalVideoFullSize= ()=> {
+        //Every 500ms, check if the video element has loaded
+        let b = setInterval(()=>{
+            if(videoRef.current.readyState >= 3){
+                //This block of code is triggered when the video is loaded
+                //your code goes here
+                setOriginalVideoSize({
+                    width: videoRef.current.videoWidth,
+                    height: videoRef.current.videoHeight
+                })
+                //stop checking every half second
+                clearInterval(b);
+            }
+        },500);
+    }
     useEffect(() => {
         sourceRef.current.src = videoSource;
         videoRef.current.load();
-    }, [videoSource]);
+        updateOriginalVideoFullSize();
+    }, [videoSource, videoRef]);
 
     return (
         <div className="video-canvas-container">

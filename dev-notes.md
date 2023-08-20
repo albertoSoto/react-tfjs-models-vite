@@ -1,6 +1,10 @@
 ## Child to parent communication
 https://stackoverflow.com/questions/37949981/call-child-method-from-parent
 
+## Blazepose: 3d model
+https://github.com/google/mediapipe/blob/master/docs/solutions/pose.md
+https://selvamsubbiah.com/pose-detection-using-blazepose-in-tensorflow-js/
+
 ## Base tutorial
 https://blog.tensorflow.org/2021/08/3d-pose-detection-with-mediapipe-blazepose-ghum-tfjs.html
 https://github.com/tensorflow/tfjs-models/blob/master/pose-detection/demos/upload_video/src/index.js    

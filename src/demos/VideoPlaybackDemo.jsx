@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2021-2022 The SeedV Lab.
+ * Copyright 2023 Alberto Soto - LINCE PLUS
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -20,19 +21,13 @@ import React, {useRef, useState} from 'react';
 import * as posedetection from '@tensorflow-models/pose-detection';
 import {drawPose} from '../lib';
 import MoveNetLoader from '../lib/models/MoveNetLoader';
+// import BlazePoseLoader from '../lib/models/BlazePoseLoader';
 import VideoPlayback from '../lib/components/VideoPlayback';
 import BlazePose from '../lib/components/BlazePose';
 
 const VideoPlaybackDemo = () => {
     const [selectedFile, setSelectedFile] = useState(null);
-    // const [originalSize, setOriginalSize] = useState({
-    //     width: null,
-    //     height: null
-    // });
-    const [originalSize, setOriginalSize] = useState({
-        width: 1280,
-        height: 720
-    });
+    const [originalSize, setOriginalSize] = useState(null);
     const canvasRef = useRef(null);
     const videoPlaybackRef = useRef(null);
     const model = posedetection.SupportedModels.MoveNet;
@@ -61,16 +56,6 @@ const VideoPlaybackDemo = () => {
     const onPoseEstimate = (pose) => {
         const ctx = canvasRef.current.getContext('2d');
         const canvas = canvasRef.current;
-        if (!originalSize) {
-            setOriginalSize({
-                width: 1280,
-                height: 720
-            })
-            // setOriginalSize({
-            //     width: videoPlaybackRef.current.getVideo() ? videoPlaybackRef.current.getVideo().videoWidth : null,
-            //     height: videoPlaybackRef.current.getVideo() ? videoPlaybackRef.current.getVideo().videoHeight : null
-            // })
-        }
         if (!isPoseShown) {
             console.log(pose);
             console.log(originalSize)
@@ -99,15 +84,19 @@ const VideoPlaybackDemo = () => {
                 <button onClick={fileUploadHandler}>Upload</button>
             </>}
             <VideoPlayback style={style} videoSource={videoSource} ref={videoPlaybackRef}
-                           setCanvas={setCanvas} controlsEnabled={false} width={600}>
+                           setCanvas={setCanvas} controlsEnabled={false} width={900}
+                           setOriginalVideoSize={setOriginalSize}>
                 <BlazePose
                     backend='webgl'
                     runtime='tfjs'
+                    // loader={BlazePoseLoader}
+                    // type={"full"}
+                    loader={MoveNetLoader}
                     type={posedetection.movenet.modelType.SINGLEPOSE_THUNDER}
                     maxPoses={1}
                     flipHorizontal={true}
-                    loader={MoveNetLoader}
-                    onPoseEstimate={onPoseEstimate}/>
+                    onPoseEstimate={onPoseEstimate}
+                />
             </VideoPlayback>
         </div>
     );
