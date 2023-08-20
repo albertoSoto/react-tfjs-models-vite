@@ -20,6 +20,7 @@ import React, {useEffect, useRef, useState, useImperativeHandle} from 'react';
 import {VideoContext} from './global';
 import './VideoPlayback.css';
 import {getCustomHeightWithOriginalAspectRatio} from "../utils/handpose";
+import log from '../utils/logger';
 
 const initVideoState = {
     video: null,
@@ -46,9 +47,9 @@ const VideoPlayback = (props, ref) => {
         canvas.width = width ? width : video.videoWidth;
         canvas.height = width ? getCustomHeightWithOriginalAspectRatio(video.videoWidth, video.videoHeight, width) : video.videoHeight;
         videoState.height = canvas.height;
-        console.log(`Video Size is ${video.videoWidth}x${video.videoHeight}`)
-        console.log(`Working with a canvas size ${canvas.width}x${canvas.height}`)
-        console.log(`Video resized?${isResized}`);
+        log(`Video Size is ${video.videoWidth}x${video.videoHeight}`)
+        log(`Working with a canvas size ${canvas.width}x${canvas.height}`)
+        log(`Video resized?${isResized}`);
         setCanvas(canvas);
         animate();
     };

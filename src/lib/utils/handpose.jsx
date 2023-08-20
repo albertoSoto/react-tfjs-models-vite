@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import log from './logger';
 const fingerJoints = {
     thumb: [0, 1, 2, 3, 4],
     indexFinger: [0, 5, 6, 7, 8],
@@ -93,9 +93,9 @@ function drawPose(predictions, keypointIndices, adjacentPairs, ctx, resizeValues
         && resizeValues.width && resizeValues.height;
     const normalizedKeypoints =  doResizeKeypoints? resizeKeypoints(keypoints, resizeValues, originalValues) : null;
     if (!lazy) {
-        console.log(`analisis point!${resizeValues.width}x${resizeValues.height}`)
-        console.log(keypoints)
-        console.log(normalizedKeypoints)
+        log(`analisis point!${resizeValues.width}x${resizeValues.height}`)
+        log(keypoints)
+        log(normalizedKeypoints)
         lazy = true;
     }
     drawKeypoints(normalizedKeypoints ? normalizedKeypoints : keypoints, keypointIndices, ctx);

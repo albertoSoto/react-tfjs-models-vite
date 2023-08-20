@@ -24,7 +24,7 @@ import MoveNetLoader from '../lib/models/MoveNetLoader';
 // import BlazePoseLoader from '../lib/models/BlazePoseLoader';
 import VideoPlayback from '../lib/components/VideoPlayback';
 import BlazePose from '../lib/components/BlazePose';
-
+import log from '../lib/utils/logger'
 const VideoPlaybackDemo = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalSize, setOriginalSize] = useState(null);
@@ -57,8 +57,8 @@ const VideoPlaybackDemo = () => {
         const ctx = canvasRef.current.getContext('2d');
         const canvas = canvasRef.current;
         if (!isPoseShown) {
-            console.log(pose);
-            console.log(originalSize)
+            log(pose);
+            log(originalSize);
             isPoseShown = true;
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -74,7 +74,7 @@ const VideoPlaybackDemo = () => {
 
     const setCanvas = (canvas) => {
         canvasRef.current = canvas;
-        console.log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
+        log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
     };
 
     return (
