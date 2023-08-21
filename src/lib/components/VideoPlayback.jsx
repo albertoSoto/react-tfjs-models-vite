@@ -34,7 +34,7 @@ const VideoPlayback = (props, ref) => {
     const requestRef = useRef(null);
     const [videoState, setVideoState] = useState(initVideoState);
     //TODO ASF 23: pass to tsx or use proptypes
-    const {style, videoSource, setCanvas, controlsEnabled, width, setOriginalVideoSize} = props;
+    const {style, videoSource, setCanvas, controlsEnabled, width, setOriginalVideoSize, autoplay} = props;
 
     useImperativeHandle(ref, () => ({
         doPlayScene: (time) => {
@@ -108,7 +108,7 @@ const VideoPlayback = (props, ref) => {
 
     return (
         <div className="video-canvas-container">
-            <video ref={videoRef} autoPlay onLoadedData={run} onEnded={onEnded}
+            <video ref={videoRef} autoPlay={autoplay} onLoadedData={run} onEnded={onEnded}
                    style={style} controls={controlsEnabled ? controlsEnabled : true} width={width}
                    height={videoState.height}>
                 <source ref={sourceRef} type="video/mp4" width={width} height={videoState.height}/>
