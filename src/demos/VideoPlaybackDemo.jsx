@@ -17,7 +17,7 @@
  */
 
 import './VideoPlaybackDemo.css';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as posedetection from '@tensorflow-models/pose-detection';
 import {drawPose} from '../lib';
 import MoveNetLoader from '../lib/models/MoveNetLoader';
@@ -76,7 +76,12 @@ const VideoPlaybackDemo = () => {
         canvasRef.current = canvas;
         log(`Current size of canvas: ${canvas.width}x${canvas.height}`)
     };
-
+    useEffect(() => {
+        videoPlaybackRef.current.onReadyState(()=>{
+            videoPlaybackRef.current.doPlayScene(7);
+            console.log(videoPlaybackRef.current.getCurrentTime())
+        })
+    }, []);
     return (
         <div className="App">
             {videoSource == null && <>

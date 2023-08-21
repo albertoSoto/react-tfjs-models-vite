@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useRef, useState, useImperativeHandle} from 'react';
+import React, {useEffect, useRef, useState, useImperativeHandle, forwardRef} from 'react';
 import {VideoContext} from './global';
 import './VideoPlayback.css';
 import {getCustomHeightWithOriginalAspectRatio} from "../utils/handpose";
@@ -35,6 +35,27 @@ const VideoPlayback = (props, ref) => {
     const [videoState, setVideoState] = useState(initVideoState);
     //TODO ASF 23: pass to tsx or use proptypes
     const {style, videoSource, setCanvas, controlsEnabled, width, setOriginalVideoSize} = props;
+
+    useImperativeHandle(ref, () => ({
+        doPlayScene: (time) => {
+            console.log("set time to " + time)
+            videoRef.current.currentTime = time;
+        },
+        getCurrentTime: () => {
+            return videoRef.current.currentTime;
+        },
+        onReadyState: (f) => {
+            //Every 500ms, check if the video element has loaded
+            let b = setInterval(()=>{
+                if(videoRef.current.readyState >= 3){
+                    if (f && typeof f === 'function' ){
+                        f();
+                    }
+                    clearInterval(b);
+                }
+            },500);
+        }
+    }), []);
 
     //let's avoid using the control on the canvas
     const styleCanvas = {
@@ -100,4 +121,4 @@ const VideoPlayback = (props, ref) => {
     );
 };
 
-export default React.forwardRef(VideoPlayback);
+export default forwardRef(VideoPlayback);
